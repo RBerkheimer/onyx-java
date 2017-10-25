@@ -1,7 +1,7 @@
 (ns onyx-java.test.job
-  (:import [org.onyxplatform.api.java 
+  (:import [org.onyxplatform.api.java
             API OnyxNames TaskScheduler
-            EnvConfiguration PeerConfiguration 
+            EnvConfiguration PeerConfiguration
             Job Catalog Lifecycles Workflow FlowConditions]
            [org.onyxplatform.api.java.utils AsyncLifecycles])
   (:require [clojure.pprint :refer [pprint]]
@@ -13,7 +13,7 @@
 
 ; Tests a job that uses core async plugins
 ;
-(defn run-job [catalog inputs] 
+(defn run-job [catalog inputs]
   (let [onyx-id (java.util.UUID/randomUUID)
 
         _ (println "Starting Onyx Env")
@@ -29,13 +29,13 @@
         _ (println "Starting Peers (3)")
         peers  (API/startPeers 3 peer-group)
         _ (println "Started")
- 
+
         scheduler (TaskScheduler. OnyxNames/BalancedTaskSchedule)
         wf (wf/build-workflow)
-        lc (lc/build-lifecycles) 
+        lc (lc/build-lifecycles)
         fc (FlowConditions.) ; No flow conditions
 
-        job (-> (Job. scheduler)  
+        job (-> (Job. scheduler)
                (.setWorkflow wf)
                (.setCatalog catalog)
                (.setLifecycles lc)
@@ -48,19 +48,19 @@
     (try
       ; Bind inputs
       (AsyncLifecycles/bindInputs lc inputs)
-      
+
       ; Start Job
       (API/submitJob  peer-conf job)
 
       ; Collect Output and return it
-      (AsyncLifecycles/collectOutputs lc "out") 
+      (AsyncLifecycles/collectOutputs lc "out")
 
-    (catch Exception e (do 
-                         (.printStackTrace e))) 
+    (catch Exception e (do
+                         (.printStackTrace e)))
     (finally (do
                (println "Stopping Peers")
                (doseq [v-peer peers]
-                 (API/shutdownPeer v-peer)) 
+                 (API/shutdownPeer v-peer))
                (println "Stopped")
                (println "Stopping Peer Group")
                (API/shutdownPeerGroup peer-group)
@@ -68,4 +68,3 @@
                (println "Stopping Onyx Env")
                (API/shutdownEnv onyx-env)
                (println "Shutdown Complete"))))))
-
