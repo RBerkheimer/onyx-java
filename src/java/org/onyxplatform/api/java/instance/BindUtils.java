@@ -92,7 +92,6 @@ public class BindUtils implements OnyxNames {
 		java.lang.reflect.InvocationTargetException
 	{
 		Class<?> ifnClazz = loader.loadClass(fqClassName);
-		System.out.println("class " + ifnClazz);
 
 	        Class<?> ipmClazz = loader.loadClass("clojure.lang.IPersistentMap");
 		Constructor ctr = ifnClazz.getConstructor(new Class[] { ipmClazz });
