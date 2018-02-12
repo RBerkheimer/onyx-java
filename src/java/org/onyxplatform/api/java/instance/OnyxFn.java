@@ -10,6 +10,8 @@ import org.onyxplatform.api.java.OnyxNames;
 import org.onyxplatform.api.java.OnyxMap;
 import org.onyxplatform.api.java.utils.MapFns;
 
+import org.onyxplatform.api.java.instance.IOnyxFnConstructor;
+
 /**
  * OnyxFn is the base class for all User type classes that a User wishes
  * to use as an object instance as a task within an Onyx workflow. User functions
@@ -31,6 +33,10 @@ public abstract class OnyxFn extends AFn implements OnyxNames {
 	public OnyxFn(IPersistentMap m) {
 		cntrArgs = m;
 	}
+
+    public OnyxFn(IOnyxFnConstructor m) {
+        cntrArgs = m.getCast();
+    }
 
 	/**
 	 * Turns the constructor arguments from an IPersistentMap into an OnyxMap object.

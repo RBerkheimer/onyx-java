@@ -89,7 +89,7 @@ public class BindUtils implements OnyxNames {
      */
     public static Catalog addFn(Catalog catalog, String taskName,
                     int batchSize, int batchTimeout,
-                    String fqClassName, String constructorClassName, Object ctrArgs) {
+                    String fqClassName, String constructorClassName, IPersistentMap ctrArgs) {
         IPersistentMap methodCat = (IPersistentMap) instcatFn.invoke(taskName,
                                              batchSize, batchTimeout,
                                              fqClassName, constructorClassName, ctrArgs);
@@ -110,6 +110,7 @@ public class BindUtils implements OnyxNames {
 	 * @throws IllegalAccessException                      method or class definition was unavailable
 	 * @throws java.lang.reflect.InvocationTargetException an abstracted error in the method call, unpack to see actual cause
 	 */
+     @SuppressWarnings("rawtypes")
 	public static IFn loadFn(Loader loader, String fqClassName, IPersistentMap args)
 		throws ClassNotFoundException,
 		NoSuchMethodException,
@@ -135,7 +136,8 @@ public class BindUtils implements OnyxNames {
      * @throws IllegalAccessException                      method or class definition was unavailable
      * @throws java.lang.reflect.InvocationTargetException an abstracted error in the method call, unpack to see actual cause
      */
-    public static IFn loadFn(Loader loader, String fqClassName, String constructorClassName, Object args)
+     @SuppressWarnings("rawtypes")
+    public static IFn loadFn(Loader loader, String fqClassName, String ctrClassName, IPersistentMap args)
         throws ClassNotFoundException,
         NoSuchMethodException,
         InstantiationException,
@@ -143,10 +145,11 @@ public class BindUtils implements OnyxNames {
         java.lang.reflect.InvocationTargetException
     {
         Class<?> ifnClazz = loader.loadClass(fqClassName);
-        //Class<?> ipmClazz = loader.loadClass("clojure.lang.IPersistentMap");
-        Class<?> ipmClazz = loader.loadClass(constructorClassName);
-        Constructor ctr = ifnClazz.getConstructor(new Class[] { ipmClazz });
-        return (IFn) ctr.newInstance(new Object[] { (ipmClazz.cast(args)) });
+        Class<?> ctrClazz = loader.loadClass(ctrClassName);
+        Class<?> ipmClazz = loader.loadClass("clojure.lang.IPersistentMap");
+        Constructor ctrCtr = ctrClazz.getConstructor(new Class[] { ipmClazz });
+        Constructor ctr = ifnClazz.getConstructor(new Class[] { ctrClazz });
+        return (IFn) ctr.newInstance(ctrCtr.newInstance(new Object[] { args }));
     }
 
 
