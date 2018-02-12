@@ -25,11 +25,25 @@
               i (BindUtils/loadFn loader fq-class-name ctr-args)]
           (swap! loaders assoc k loader)
           (swap! instances assoc k i)
+          i))))
+  ([id fq-class-name ctr-class ctr-args]
+    (let [k (keyname id)]
+      (if (contains? @instances k)
+        (get @instances k)
+        (let [loader (Loader.)
+              i (BindUtils/loadFn loader fq-class-name ctr-class ctr-args)]
+          (swap! loaders assoc k loader)
+          (swap! instances assoc k i)
           i)))))
 
-(defn method [id fq-class-name ctr-args segment]
+(defn method
+    ([id fq-class-name ctr-args segment]
   (let [inst-ifn (instance id fq-class-name ctr-args)]
     (inst-ifn segment)))
+    ([id fq-class-name ctr-class ctr-args segment]
+  (let [inst-ifn (instance id fq-class-name ctr-class ctr-args)]
+    (inst-ifn segment))))
+
 
 (defn release [task]
   (let [k (task-id task)]
@@ -40,5 +54,5 @@
 
 (defn release-all [catalog]
   (doseq [task catalog]
-    (if (cat/instance? task)
+    (if (cat/onyx-instance? task)
       (release task))))
