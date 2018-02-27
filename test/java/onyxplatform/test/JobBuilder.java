@@ -140,14 +140,6 @@ public abstract class JobBuilder {
 	    return AsyncLifecycles.collectOutputs(job.getLifecycles(), "out");
     }
 
-    /**
-     * Releases all native-backed instances 
-     * and invokes gc.
-     */
-    public void releaseAll() {
-	System.out.println("JobBuilder::releaseAll> called");
-	BindUtils.releaseInstances(job);
-    }
 
     /**
      * Completely shuts down the environment associated with the JobBuilder

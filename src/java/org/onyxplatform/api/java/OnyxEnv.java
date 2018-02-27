@@ -308,7 +308,7 @@ public class OnyxEnv {
 		try {
 			System.out.println("Inputs: ");
 			System.out.println(inputs);
-			AsyncLifecycles.bindInputs(job.getLifecycles(), inputs);
+			AsyncLifecycles.bindInputs(job.getLifecycles(), "in", inputs);
 			System.out.println("Inputs bound.");
 			return submitJob(job);
 		}

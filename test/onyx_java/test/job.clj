@@ -13,7 +13,7 @@
 
 ; Tests a job that uses core async plugins
 ;
-(defn run-job [catalog inputs]
+(defn run-job [job inputs]
   (let [onyx-id (java.util.UUID/randomUUID)
 
         _ (println "Starting Onyx Env")
@@ -32,14 +32,16 @@
 
         scheduler (TaskScheduler. OnyxNames/BalancedTaskSchedule)
         wf (wf/build-workflow)
-        lc (lc/build-lifecycles)
+        lc (.getLifecycles job)
         fc (FlowConditions.) ; No flow conditions
 
-        job (-> (Job. scheduler)
-               (.setWorkflow wf)
-               (.setCatalog catalog)
-               (.setLifecycles lc)
-               (.setFlowConditions fc)) ]
+         ]
+     (-> job
+            (.setWorkflow wf)
+            (.setFlowConditions fc))
+    (AsyncLifecycles/addInput lc  "in")
+    (AsyncLifecycles/addOutput lc "out")
+
     (println "JOB: ===============")
     (flush)
     (pprint (.toArray job))
@@ -47,7 +49,7 @@
     (println " ===============")
     (try
       ; Bind inputs
-      (AsyncLifecycles/bindInputs lc inputs)
+      (AsyncLifecycles/bindInputs lc "in" inputs)
 
       ; Start Job
       (API/submitJob  peer-conf job)

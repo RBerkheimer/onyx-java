@@ -4,8 +4,7 @@
             [onyx-java.test.single-javafn.catalog :as cat]))
 
 (deftest java-pass-through
-  (let [catalog (cat/build-catalog) 
-        inputs  [{:pass-through "PASSTHROUGH"}] 
-        outputs (j/run-job catalog inputs) ]
+  (let [job (cat/build-job)
+        inputs  [{:pass-through "PASSTHROUGH"}]
+        outputs (j/run-job job inputs) ]
     (is (= (first inputs) (first (:out outputs))))))
-

@@ -8,7 +8,6 @@
           inputs [{:pass-through "PASSTHROUGH"}]
           expected {:out [{:pass-through "PASSTHROUGH"} :done]}
           outputs (.runJobCollectOutputs testObject [{:pass-through "PASSTHROUGH"}])]
-      (.releaseAll testObject)
       (.shutdown testObject)
       (is (= (first inputs) (first (:out outputs))))))
 
@@ -17,7 +16,6 @@
           inputs [{:pass-through "PASSTHROUGH"}]
           expected {:out [{:pass-through "PASSTHROUGH"} :done]}
           outputs (.runJobCollectOutputs testObject [{:pass-through "PASSTHROUGH"}])]
-      (.releaseAll testObject)
       (.shutdown testObject)
       (is (= (first inputs) (first (:out outputs))))))
 
@@ -29,9 +27,8 @@
           env (.getOnyx testObject) ]
       (try
         (is (.killJob env job-meta))
-        (finally 
+        (finally
           (do
-            (.releaseAll testObject)
             (.shutdown testObject))))))
 
 #_(deftest await-test
@@ -42,9 +39,8 @@
           env (.getOnyx testObject)]
       (try
         (is (.awaitJobCompletion env job-meta))
-        (finally 
+        (finally
           (do
-            (.releaseAll testObject)
             (.shutdown testObject))))))
 
 #_(deftest gc-test
@@ -55,8 +51,6 @@
           env (.getOnyx testObject) ]
       (try
         (is (.gc env))
-        (finally 
+        (finally
           (do
-            (.releaseAll testObject)
             (.shutdown testObject))))))
-

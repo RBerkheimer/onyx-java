@@ -119,12 +119,13 @@ public interface OnyxNames {
 	public static final String KeywordizeStrArray 	= "keywordize-str-array";
 
 	public static final String INSTANCE_CATALOG     = "onyx-java.instance.catalog";
-	public static final String CreateMethod 	= "create-method";
+	public static final String MakeInstanceTask 	= "make-instance-task";
+
+    public static final String INSTANCE_LIFECYCLES     = "onyx-java.instance.lifecycles";
+    public static final String MakeInstanceLifecycle 	= "make-instance-lifecycle";
 
 	public static final String INSTANCE_BIND     	= "onyx-java.instance.bind";
-	public static final String Method 		= "method";
-	public static final String ReleaseInst 		= "release";
-	public static final String ReleaseAllInst 	= "release-all";
+	public static final String InstanceMethod 		= "method";
 
 	public static final String TIMBRE = "onyx-java.utils.timbre";
 	public static final String TIMBRE_LOG_KEY = "onyx.log/config";

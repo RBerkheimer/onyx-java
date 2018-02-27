@@ -25,9 +25,8 @@ public class API implements OnyxNames {
         IFn require = Clojure.var(CORE, Require);
         require.invoke(Clojure.read(API));
 
-	// instance binding
         require.invoke(Clojure.read(INSTANCE_BIND));
-        bind = Clojure.var(INSTANCE_BIND, Method);
+        bind = Clojure.var(INSTANCE_BIND, InstanceMethod);
     }
 
     /**
@@ -134,7 +133,7 @@ public class API implements OnyxNames {
     public static IPersistentMap submitJob(PeerConfiguration peerConfig, Job job) {
         IFn submitJob = Clojure.var(API, SubmitJob);
         Object c = peerConfig.toMap();
-	Object j = job.toArray();
+        Object j = job.toArray();
         return (IPersistentMap) submitJob.invoke(c, j);
     }
 

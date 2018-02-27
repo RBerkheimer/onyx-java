@@ -1,21 +1,20 @@
 package org.onyxplatform.api.java.instance;
 
-import java.lang.reflect.Constructor;
-import java.lang.reflect.Method;
-import java.lang.Thread;
-
 import clojure.java.api.Clojure;
 import clojure.lang.IFn;
 import clojure.lang.IPersistentMap;
 import clojure.lang.PersistentVector;
-
-import org.onyxplatform.api.java.OnyxNames;
-import org.onyxplatform.api.java.OnyxMap;
+import java.lang.Thread;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.Method;
 import org.onyxplatform.api.java.Catalog;
-import org.onyxplatform.api.java.Task;
 import org.onyxplatform.api.java.Job;
-
+import org.onyxplatform.api.java.Lifecycle;
+import org.onyxplatform.api.java.OnyxMap;
+import org.onyxplatform.api.java.OnyxNames;
+import org.onyxplatform.api.java.Task;
 import org.onyxplatform.api.java.utils.MapFns;
+import java.util.UUID;
 
 /**
  * BindUtils is a static utility class designed to work with User Classes
@@ -28,22 +27,21 @@ import org.onyxplatform.api.java.utils.MapFns;
  */
 public class BindUtils implements OnyxNames {
 
-	protected static IFn instcatFn;
-	protected static IFn releaseFn;
-	protected static IFn releaseAllFn;
+	protected static IFn makeInstanceTask;
+    protected static IFn makeInstanceLifecycle;
 
 	/**
  	* Loads the clojure namespaces.
  	*/
 	static {
-    		IFn requireFn = Clojure.var(CORE, Require);
+    	IFn requireFn = Clojure.var(CORE, Require);
 
 		requireFn.invoke(Clojure.read(INSTANCE_CATALOG));
-		instcatFn = Clojure.var(INSTANCE_CATALOG, CreateMethod);
+		makeInstanceTask = Clojure.var(INSTANCE_CATALOG, MakeInstanceTask);
 
-		requireFn.invoke(Clojure.read(INSTANCE_BIND));
-		releaseFn = Clojure.var(INSTANCE_BIND, ReleaseInst);
-		releaseAllFn = Clojure.var(INSTANCE_BIND, ReleaseAllInst);
+        requireFn.invoke(Clojure.read(INSTANCE_LIFECYCLES));
+        makeInstanceLifecycle = Clojure.var(INSTANCE_LIFECYCLES, MakeInstanceLifecycle);
+
 	}
 
 	/**
@@ -53,7 +51,7 @@ public class BindUtils implements OnyxNames {
 	 * must be provided, along with the fully qualified user base class,
 	 * a map of arguments to use as constructor args for the class,
 	 * and the environment parameters batchSize and batchTimeout.
-	 * @param  catalog       the catalog object to which the new object instance will be added as a task
+	 * @param  job       The job to which the instance task will be added
 	 * @param  taskName      a string to use as a name for the object instance task in the Catalog
 	 * @param  batchSize     an integer describing the number of segments that will be read at a time
 	 * @param  batchTimeout  an integer describing the longest amount of time (ms) that a task will wait before reading segments
@@ -61,15 +59,17 @@ public class BindUtils implements OnyxNames {
 	 * @param  ctrArgs       an IPersistentMap containing arguments to use in the user class constructor
 	 * @return                returns the updated catalog which includes the added task
 	 */
-	public static Catalog addFn(Catalog catalog, String taskName,
-				    int batchSize, int batchTimeout,
-				    String fqClassName, IPersistentMap ctrArgs) {
-		IPersistentMap methodCat = (IPersistentMap) instcatFn.invoke(taskName,
-								             batchSize, batchTimeout,
-							  	             fqClassName, ctrArgs);
-		OnyxMap e = MapFns.toOnyxMap(methodCat);
-		Task methodTask = new Task(e);
-		return catalog.addTask(methodTask);
+	public static void addFn(Job job, String taskName, int batchSize, int batchTimeout,
+				                String fqClassName, IPersistentMap ctrArgs) {
+	IPersistentMap rawTaskMap = (IPersistentMap) makeInstanceTask.invoke(taskName, batchSize, batchTimeout, fqClassName, ctrArgs);
+        UUID taskId = (UUID) MapFns.get(rawTaskMap, "java-instance/id");
+		OnyxMap taskMap = MapFns.toOnyxMap(rawTaskMap);
+		Task task = new Task(taskMap);
+		job.getCatalog().addTask(task);
+        IPersistentMap rawLifecycleMap = (IPersistentMap) makeInstanceLifecycle.invoke(taskName, "basic");
+        OnyxMap lifecycleMap = MapFns.toOnyxMap(rawLifecycleMap);
+        Lifecycle lifecycle = new Lifecycle(lifecycleMap);
+        job.getLifecycles().addLifecycle(lifecycle);
 	}
 
     /**
@@ -87,15 +87,17 @@ public class BindUtils implements OnyxNames {
      * @param  ctrArgs       an IPersistentMap containing arguments to use in the user class constructor
      * @return                returns the updated catalog which includes the added task
      */
-    public static Catalog addFn(Catalog catalog, String taskName,
-                    int batchSize, int batchTimeout,
-                    String fqClassName, String constructorClassName, IPersistentMap ctrArgs) {
-        IPersistentMap methodCat = (IPersistentMap) instcatFn.invoke(taskName,
-                                             batchSize, batchTimeout,
-                                             fqClassName, constructorClassName, ctrArgs);
-        OnyxMap e = MapFns.toOnyxMap(methodCat);
-        Task methodTask = new Task(e);
-        return catalog.addTask(methodTask);
+    public static void addFn(Job job, String taskName, int batchSize, int batchTimeout,
+                                String fqClassName, String ctrClassName, IPersistentMap ctrArgs) {
+        IPersistentMap rawTaskMap = (IPersistentMap) makeInstanceTask.invoke(taskName, batchSize, batchTimeout, fqClassName, ctrClassName, ctrArgs);
+        UUID taskId = (UUID) MapFns.get(rawTaskMap, "java-instance/id");
+        OnyxMap taskMap = MapFns.toOnyxMap(rawTaskMap);
+		Task task = new Task(taskMap);
+		job.getCatalog().addTask(task);
+        IPersistentMap rawLifecycleMap = (IPersistentMap) makeInstanceLifecycle.invoke(taskName, "user");
+        OnyxMap lifecycleMap = MapFns.toOnyxMap(rawLifecycleMap);
+        Lifecycle lifecycle = new Lifecycle(lifecycleMap);
+        job.getLifecycles().addLifecycle(lifecycle);
     }
 
 	/**
@@ -152,26 +154,4 @@ public class BindUtils implements OnyxNames {
         return (IFn) ctr.newInstance(ctrCtr.newInstance(new Object[] { args }));
     }
 
-
-	/**
-	 * Given a task, releases the object instance associated with the task,
-	 * freeing it up for garbage collection by the JVM.
-	 * @param task task associated with the object instance to release for gc
-	 */
-	public static void releaseInstance(Task task) {
-		IPersistentMap e = task.toMap();
-		releaseFn.invoke(e);
-		System.gc();
-	}
-
-	/**
-	 * Given a job, releases all object instances for all tasks in the job
-	 * catalog which are associated with a user object instance.
-	 * @param j the job containing a catalog of tasks to release for gc
-	 */
-	public static void releaseInstances(Job j) {
-		PersistentVector at = j.getCatalog().tasks();
-		releaseAllFn.invoke(at);
-		System.gc();
-	}
 }

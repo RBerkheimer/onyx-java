@@ -70,13 +70,14 @@ public class AsyncLifecycles implements OnyxNames {
 	 * Binds input segments (a PersistentVector of inputs, can be filename strings, etc.)
 	 * to the lifecycles. This ensures the async channels are loaded with the inputs.
 	 * @param l      The lifecycles object which the inputs should be bound to
+     * @param name      The input channel name to bind to
 	 * @param inputs a PersistentVector of input segments to be bound
 	 */
-	public static void bindInputs(Lifecycles l, PersistentVector inputs) {
+	public static void bindInputs(Lifecycles l, String name, PersistentVector inputs) {
 
 		PersistentVector cycles = l.cycles();
 		OnyxMap om = new OnyxMap();
-		om.addObjectParameter("in", inputs);
+		om.addObjectParameter(name, inputs);
 		bindFn.invoke(cycles, om.toMap());
 	}
 

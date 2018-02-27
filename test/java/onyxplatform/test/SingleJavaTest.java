@@ -4,7 +4,6 @@ import clojure.java.api.Clojure;
 import clojure.lang.IFn;
 import clojure.lang.IPersistentMap;
 
-import org.onyxplatform.api.java.Catalog;
 import org.onyxplatform.api.java.Task;
 import org.onyxplatform.api.java.utils.MapFns;
 
@@ -31,8 +30,7 @@ public class SingleJavaTest extends JobBuilder {
      * Adds an Object instance of the test function to the Job catalog
      */
 	public void configureCatalog() {
-		Catalog c = job.getCatalog();
-		BindUtils.addFn(c, "pass",
+		BindUtils.addFn(job, "pass",
 				batchSize(), batchTimeout(),
 				"onyxplatform.test.PassFn", MapFns.emptyMap());
 	}

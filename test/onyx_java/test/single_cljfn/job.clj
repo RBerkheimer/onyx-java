@@ -5,8 +5,7 @@
             [onyx-java.test.single-cljfn.catalog :as cat]))
 
 (deftest clj-pass-through
-  (let [catalog (cat/build-catalog) ;cat/expected
-        inputs  [{:pass-through "PASSTHROUGH"}] 
-        outputs (j/run-job catalog inputs) ]
+  (let [job (cat/build-job)
+        inputs  [{:pass-through "PASSTHROUGH"}]
+        outputs (j/run-job job inputs) ]
     (is (= (first inputs) (first (:out outputs))))))
-
