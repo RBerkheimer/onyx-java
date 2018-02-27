@@ -62,7 +62,6 @@ public class BindUtils implements OnyxNames {
 	public static void addFn(Job job, String taskName, int batchSize, int batchTimeout,
 				                String fqClassName, IPersistentMap ctrArgs) {
 	IPersistentMap rawTaskMap = (IPersistentMap) makeInstanceTask.invoke(taskName, batchSize, batchTimeout, fqClassName, ctrArgs);
-        UUID taskId = (UUID) MapFns.get(rawTaskMap, "java-instance/id");
 		OnyxMap taskMap = MapFns.toOnyxMap(rawTaskMap);
 		Task task = new Task(taskMap);
 		job.getCatalog().addTask(task);
@@ -90,7 +89,6 @@ public class BindUtils implements OnyxNames {
     public static void addFn(Job job, String taskName, int batchSize, int batchTimeout,
                                 String fqClassName, String ctrClassName, IPersistentMap ctrArgs) {
         IPersistentMap rawTaskMap = (IPersistentMap) makeInstanceTask.invoke(taskName, batchSize, batchTimeout, fqClassName, ctrClassName, ctrArgs);
-        UUID taskId = (UUID) MapFns.get(rawTaskMap, "java-instance/id");
         OnyxMap taskMap = MapFns.toOnyxMap(rawTaskMap);
 		Task task = new Task(taskMap);
 		job.getCatalog().addTask(task);
