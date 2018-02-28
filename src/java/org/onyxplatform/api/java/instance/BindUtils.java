@@ -42,6 +42,8 @@ public class BindUtils implements OnyxNames {
         requireFn.invoke(Clojure.read(INSTANCE_LIFECYCLES));
         makeInstanceLifecycle = Clojure.var(INSTANCE_LIFECYCLES, MakeInstanceLifecycle);
 
+        requireFn.invoke(Clojure.read(INSTANCE_BIND));
+
 	}
 
 	/**

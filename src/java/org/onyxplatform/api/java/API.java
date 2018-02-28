@@ -13,20 +13,16 @@ import clojure.lang.PersistentArrayMap;
 public class API implements OnyxNames {
 
     /**
-    which are referenced in generated workflows (currently onyx-java.instance.bind).
-    This solves class-not-found exceptions when they are obliquely referenced in a Job.
-    */
-    private final static IFn bind;
-
-    /**
      * Loads the required namespaces for use in Java
      */
     static {
         IFn require = Clojure.var(CORE, Require);
         require.invoke(Clojure.read(API));
 
+        require.invoke(Clojure.read(INSTANCE_CATALOG));
+        require.invoke(Clojure.read(INSTANCE_LIFECYCLES));
         require.invoke(Clojure.read(INSTANCE_BIND));
-        bind = Clojure.var(INSTANCE_BIND, InstanceMethod);
+
     }
 
     /**
