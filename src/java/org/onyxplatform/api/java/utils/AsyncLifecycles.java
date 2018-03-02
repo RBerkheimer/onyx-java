@@ -118,7 +118,8 @@ public class AsyncLifecycles implements OnyxNames {
 		PersistentVector outputs = PersistentVector.EMPTY;
 		Object k = kwFn.invoke(outputName);
 		outputs = outputs.cons(k);
-		return (IPersistentMap) collectFn.invoke(cycles, outputs);
+		IPersistentMap out = (IPersistentMap) collectFn.invoke(cycles, outputs);
+        return out;
 	}
 
 	/**
@@ -139,6 +140,25 @@ public class AsyncLifecycles implements OnyxNames {
 		outputs = outputs.cons(k);
 		return (IPersistentMap) collectFn.invoke(cycles, outputs);
 	}
+
+    /**
+     * Convenience function which mirrors the behavior of the other collectOutputs
+     * methods, except this version can be called directly on a Job. For the specified
+     * job, collects the outputs from the specified output lifecycle names.
+     * Returns an IPersistentMap of the outputs.
+     * @param  j            the job object for which to collect outputs
+     * @param  name        the name of the lifecycle for which outputs are expected
+     * @return           an IPersistentMap of the collected outputs
+     */
+    public static IPersistentMap collectOutputs(Job j, String name) {
+        PersistentVector cycles = j.getLifecycles().cycles();
+        PersistentVector outputs = PersistentVector.EMPTY;
+        Object k = kwFn.invoke(name);
+        outputs = outputs.cons(k);
+        IPersistentMap out = (IPersistentMap) collectFn.invoke(cycles, k);
+        return out;
+    }
+
 
 	/**
 	 * Convenience function which mirrors the behavior of the other collectOutputs
