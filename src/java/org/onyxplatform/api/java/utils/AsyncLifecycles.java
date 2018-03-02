@@ -155,7 +155,7 @@ public class AsyncLifecycles implements OnyxNames {
         PersistentVector outputs = PersistentVector.EMPTY;
         Object k = kwFn.invoke(name);
         outputs = outputs.cons(k);
-        IPersistentMap out = (IPersistentMap) collectFn.invoke(cycles, k);
+        IPersistentMap out = (IPersistentMap) collectFn.invoke(cycles, outputs);
         return out;
     }
 
