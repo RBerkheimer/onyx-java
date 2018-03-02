@@ -5,6 +5,7 @@
                  [org.clojure/core.async "0.2.371"]
                  [clj-stacktrace "0.2.8"]
                  [org.onyxplatform/onyx "0.9.15"]
+                 ;[org.onyxplatform/onyx "0.12.7"]
                  [com.stuartsierra/component "0.2.3"]
                  [com.taoensso/timbre "4.10.0"]]
   :source-paths ["src/clj" "test"]

@@ -1,36 +1,45 @@
 (ns onyx-java.instance.lifecycles
-  (:gen-class)
-  (:import [org.onyxplatform.api.java.instance BindUtils Loader OnyxFn]))
+  (:gen-class))
 
 (def instances (atom {}))
-(def classloaders (atom {}))
+
+(defn class-factory [classname & types]
+    ;; Uses a classname and an arbitrary number of (optional) arguments
+    ;; to define a factory which is capable of creating classes.
+  (let [args (map #(with-meta (symbol (str "x" %2)) {:tag %1}) types (range))]
+    (eval `(fn [~@args] (new ~(symbol classname) ~@args)))))
+
+(defn make-basic-factory [fqclass]
+    (class-factory fqclass "clojure.lang.IPersistentMap"))
+
+(defn make-user-factory [fqclass fqctrclass]
+    (class-factory fqclass fqctrclass))
 
 (defn keyname [id]
   (keyword (str id)))
 
 (defn before-java-task-ctr [event lifecycle]
-    (let [classloader (Loader.)
-          task-inst (BindUtils/loadFn classloader
-                    (str (:java-instance/class (:onyx.core/task-map event)))
-                    (str (:java-instance/ctr (:onyx.core/task-map event)))
-                    (:java-instance/args (:onyx.core/task-map event)))]
-            (swap! classloaders assoc (keyname (:java-instance/id (:onyx.core/task-map event))) classloader)
-            (swap! instances assoc (keyname (:java-instance/id (:onyx.core/task-map event))) task-inst))
+    (let [user-class (str (:java-instance/class (:onyx.core/task-map event)))
+          user-ctr (str (:java-instance/ctr (:onyx.core/task-map event)))
+          ctr-args (:java-instance/args (:onyx.core/task-map event))
+          class-factory (make-user-factory user-class user-ctr)
+          instance (class-factory ctr-args)
+          instance-key (keyname (:java-instance/id (:onyx.core/task-map event)))]
+            (swap! instances assoc instance-key instance))
             {})
 
 (defn before-java-task-basic [event lifecycle]
-    (let [classloader (Loader.)
-          task-inst (BindUtils/loadFn classloader
-                    (str (:java-instance/class (:onyx.core/task-map event)))
-                    (:java-instance/args (:onyx.core/task-map event)))]
-            (swap! classloaders assoc (keyname (:java-instance/id (:onyx.core/task-map event))) classloader)
-            (swap! instances assoc (keyname (:java-instance/id (:onyx.core/task-map event))) task-inst))
+    (let [user-class (str (:java-instance/class (:onyx.core/task-map event)))
+          ctr-args (:java-instance/args (:onyx.core/task-map event))
+          class-factory (make-basic-factory user-class)
+          instance (class-factory ctr-args)
+          instance-key (keyname (:java-instance/id (:onyx.core/task-map event)))]
+            (swap! instances assoc instance-key instance))
             {})
 
 (defn after-java-task [event lifecycle]
     (if (contains? @instances (keyname (:java-instance/id (:onyx.core/task-map event))))
       (let [k (keyname (:java-instance/id (:onyx.core/task-map event)))]
-        (swap! classloaders dissoc k)
         (swap! instances dissoc k)))
         {})
 

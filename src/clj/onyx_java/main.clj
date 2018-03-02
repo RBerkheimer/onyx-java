@@ -27,10 +27,11 @@
            [org.onyxplatform.api.java.instance
             Loader
             BindUtils
-            OnyxFn]
+            OnyxFn
+            IOnyxFnConstructor]
            [org.onyxplatform.api.java.utils
             AsyncCatalog
             AsyncLifecycles
             MapFns
             VectorFns
-            Timbre]))
+            Timbre])
