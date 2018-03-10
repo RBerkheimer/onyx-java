@@ -1,5 +1,7 @@
 # Onyx-Java
 
+<strong>0.1.7</strong>
+
 Onyx-Java is designed to allow users who write Java code to use the Onyx Platform.
 <br>
 The package provides the following features:
@@ -14,6 +16,13 @@ The package provides the following features:
 ## Build Status
 
 CircleCI Tests:  [![CircleCI](https://circleci.com/gh/RBerkheimer/onyx-java.svg?style=svg)](https://circleci.com/gh/RBerkheimer/onyx-java)
+
+Currently, we are successfully testing on Onyx 0.9.15, and supporting async jobs.
+Plans are in the works to move to the Onyx .12 series soon to accommodate trigger emission to downstream tasks.
+As of now, the package is functionally complete for async jobs using zookeeper - we currently have no aspirations to adding other plugins to this library, like Kafka or S3.
+If you're interested in adding these features, please get in touch.
+Most new features that aren't related to fixing Onyx breaking changes will be utils packages to make using the package easier and/or more clear.
+These utils packages will not be fully generic but will be targeted toward more specific use cases - like adding certain windows, triggers, and flow condition scenarios.
 
 ## API Docs
 
