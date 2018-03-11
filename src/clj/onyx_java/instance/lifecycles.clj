@@ -22,8 +22,10 @@
     (let [user-class (str (:java-instance/class (:onyx.core/task-map event)))
           user-ctr (str (:java-instance/ctr (:onyx.core/task-map event)))
           ctr-args (:java-instance/args (:onyx.core/task-map event))
+          ctr-factory (make-user-factory user-ctr "clojure.lang.IPersistentMap")
+          ctr-instance (ctr-factory ctr-args)
           class-factory (make-user-factory user-class user-ctr)
-          instance (class-factory ctr-args)
+          instance (class-factory ctr-instance)
           instance-key (keyname (:java-instance/id (:onyx.core/task-map event)))]
             (swap! instances assoc instance-key instance))
             {})

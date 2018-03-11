@@ -4,6 +4,7 @@ import clojure.java.api.Clojure;
 import clojure.lang.IFn;
 import clojure.lang.IPersistentMap;
 import clojure.lang.PersistentVector;
+import org.onyxplatform.api.java.instance.IOnyxFnConstructor;
 import java.lang.Thread;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
@@ -89,7 +90,7 @@ public class BindUtils implements OnyxNames {
      * @return                returns the updated catalog which includes the added task
      */
     public static void addFn(Job job, String taskName, int batchSize, int batchTimeout,
-                                String fqClassName, String ctrClassName, IPersistentMap ctrArgs) {
+                                String fqClassName, String ctrClassName, IOnyxFnConstructor ctrArgs) {
         IPersistentMap rawTaskMap = (IPersistentMap) makeInstanceTask.invoke(taskName, batchSize, batchTimeout, fqClassName, ctrClassName, ctrArgs);
         OnyxMap taskMap = MapFns.toOnyxMap(rawTaskMap);
 		Task task = new Task(taskMap);

@@ -1,6 +1,6 @@
 (ns onyx-java.test.pure-java
   (:gen-class)
-  (:import [onyxplatform.test SingleJavaTest SingleCljTest])
+  (:import [onyxplatform.test SingleJavaTest SingleCljTest SingleCustomJavaTest])
   (:require [clojure.test :refer [deftest is]]))
 
 (deftest single-java-test
@@ -10,6 +10,14 @@
           outputs (.runJobCollectOutputs testObject [{:pass-through "PASSTHROUGH"}])]
       (.shutdown testObject)
       (is (= (first inputs) (first (:out outputs))))))
+
+(deftest single-custom-java-test
+  (let [testObject (SingleCustomJavaTest. "onyx-env.edn")
+        inputs [{:pass-through "PASSTHROUGH"}]
+        expected {:out [{:pass-through "PASSTHROUGH"} :done]}
+        outputs (.runJobCollectOutputs testObject [{:pass-through "PASSTHROUGH"}])]
+    (.shutdown testObject)
+    (is (= (first inputs) (first (:out outputs))))))
 
 #_(deftest single-clj-test
     (let [testObject (SingleCljTest. "onyx-env.edn")

@@ -21,5 +21,5 @@
             :java-instance/id (java.util.UUID/randomUUID)
             :java-instance/class class
             :java-instance/ctr ctr
-            :java-instance/args args
+            :java-instance/args (.getCast args)
             :onyx/params [:java-instance/id] }))
