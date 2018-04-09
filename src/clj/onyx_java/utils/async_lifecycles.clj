@@ -6,7 +6,7 @@
 ;; Defs --------------------------------
 ;;
 
-(def input-channel-capacity 10000)
+(def input-channel-capacity 1e6)
 (def output-channel-capacity (inc input-channel-capacity))
 
 
